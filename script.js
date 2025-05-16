@@ -1,9 +1,9 @@
 let w = (c.width = window.innerWidth),
   h = (c.height = window.innerHeight),
   ctx = c.getContext("2d"),
-  hw = w / 2;
-(hh = h / 2),
-  (opts = {
+  hw = w / 2,
+  hh = h / 2,
+  opts = {
     // change the text in here //
     strings: ["HAPPY", "BIRTHDAY!", "to You", "Madam jii"],
     charSize: 30,
@@ -44,22 +44,23 @@ let w = (c.width = window.innerWidth),
     balloonAddedVel: 0.4,
     balloonBaseRadian: -(Math.PI / 2 - 0.5),
     balloonAddedRadian: -1,
-  }),
-  (calc = {
+  },
+  calc = {
     totalWidth:
       opts.charSpacing *
       Math.max(opts.strings[0].length, opts.strings[1].length),
-  }),
-  (Tau = Math.PI * 2),
-  (TauQuarter = Tau / 4),
-  (letters = []);
+  },
+  Tau = Math.PI * 2,
+  TauQuarter = Tau / 4,
+  letters = [];
 
 ctx.font = opts.charSize + "px Verdana";
 
-function Letter(char, x, y) {
+function Letter(char, x, y, index) {
   this.char = char;
   this.x = x;
   this.y = y;
+  this.index = index;
 
   this.dx = -ctx.measureText(char).width / 2;
   this.dy = +opts.charSize / 2;
@@ -79,7 +80,9 @@ Letter.prototype.reset = function () {
   this.phase = "firework";
   this.tick = 0;
   this.spawned = false;
-  this.spawningTime = (opts.fireworkSpawnTime * Math.random()) | 0;
+  // Added delay by index * 30ms here
+  this.spawningTime =
+    ((opts.fireworkSpawnTime * Math.random()) | 0) + this.index * 30;
   this.reachTime =
     (opts.fireworkBaseReachTime + opts.fireworkAddedReachTime * Math.random()) |
     0;
@@ -297,6 +300,7 @@ Letter.prototype.step = function () {
     }
   }
 };
+
 function Shard(x, y, vx, vy, color) {
   var vel =
     opts.fireworkShardBaseVel + opts.fireworkShardAddedVel * Math.random();
@@ -372,6 +376,7 @@ function anim() {
   if (done) for (var l = 0; l < letters.length; ++l) letters[l].reset();
 }
 
+let letterIndex = 0;
 for (let i = 0; i < opts.strings.length; ++i) {
   for (var j = 0; j < opts.strings[i].length; ++j) {
     letters.push(
@@ -382,7 +387,8 @@ for (let i = 0; i < opts.strings.length; ++i) {
           (opts.strings[i].length * opts.charSize) / 2,
         i * opts.lineHeight +
           opts.lineHeight / 2 -
-          (opts.strings.length * opts.lineHeight) / 2
+          (opts.strings.length * opts.lineHeight) / 2,
+        letterIndex++
       )
     );
   }
